@@ -1,5 +1,4 @@
 import org.apache.log4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +19,8 @@ public class PaymentDaoHashMapImpl implements PaymentDao {
 
     /**
      * Creates single payment
-     * @param currency
-     * @param amount
+     * @param currency currency code
+     * @param amount amount value
      */
     public void createPayment(String currency, Double amount) {
         logger.debug("Creating payment :: "+currency+" "+amount);

@@ -5,7 +5,7 @@ public class App {
 
     /**
      * Entry point to executing of program
-     * @param args
+     * @param args application args
      */
     public static void main (String [] args) {
 
@@ -17,7 +17,6 @@ public class App {
         /** Initialization */
         InputManager reader = new InputManager(consoleReader, paymentDao);
         OutputManager writer = new OutputManager(paymentDao);
-        writer.setInterval(20*1000L);
 
         /** Threads starting */
         writer.run();
