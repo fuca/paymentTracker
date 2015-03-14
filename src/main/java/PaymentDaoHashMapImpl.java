@@ -32,6 +32,15 @@ public class PaymentDaoHashMapImpl implements PaymentDao {
     }
 
     /**
+     * Returns value of passed currency
+     * @param code currency code
+     * @return amount of passed currency
+     */
+    public double getAmount(String code) {
+        return this.storage.get(code);
+    }
+
+    /**
      * Returns copy of data collection
      * @return Map of entries
      */
