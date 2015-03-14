@@ -1,6 +1,5 @@
 import com.sun.media.sound.InvalidFormatException;
 import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -13,9 +12,9 @@ public class InputManager extends Thread {
 
     private ConsoleReader cReader;
     private FileReader fReader;
-    private PaymentDaoHashMapImpl pDao;
+    private PaymentDao pDao;
 
-    public InputManager (ConsoleReader cr, PaymentDaoHashMapImpl pd) {
+    public InputManager (ConsoleReader cr, PaymentDao pd) {
         this.cReader = cr;
         this.fReader = null;
         this.pDao = pd;
@@ -30,7 +29,7 @@ public class InputManager extends Thread {
             try {
                 String s = cReader.readLine();
                 executeCommand(s);
-            } catch (InvalidFormatException e) {
+            } catch (IllegalArgumentException e) {
                 System.out.println("Bad format of input! Example: USD 100");
             } catch (IOException e) {
                 logger.error(e);
@@ -41,10 +40,10 @@ public class InputManager extends Thread {
     /**
      * Validation and recognizing of input line commands
      * @param s Input line content
-     * @throws InvalidFormatException
+     * @throws IllegalArgumentException
      */
-    private void executeCommand(String s) throws InvalidFormatException {
-        List<String> lines = null;
+    private void executeCommand(String s) throws IllegalArgumentException {
+        List<String> lines;
 
         if (quitCommand(s)) {
             logger.debug("Quit command recognized");
@@ -62,7 +61,9 @@ public class InputManager extends Thread {
                 }
                 lines = fReader.readInputFile(s);
                 for(String line: lines) {
-                    parsePayment(line);
+                    if (this.inputCommand(line)) {
+                        parsePayment(line);
+                    }
                 }
             } catch (IOException e) {
                 logger.error(e.getMessage());
@@ -92,13 +93,13 @@ public class InputManager extends Thread {
      * Checks whether input line contains read from file command (-f)
      * @param s Input line content
      * @return if command is present
-     * @throws InvalidFormatException
+     * @throws IllegalArgumentException
      */
-    private boolean fileCommand(String s) throws InvalidFormatException {
+    private boolean fileCommand(String s) throws IllegalArgumentException {
         CharSequence cs = "-f";
         if (s.contains(cs)) {
             if (!s.matches("-f\\u0020.+\\.txt")) {
-                throw new InvalidFormatException("Passed command or its argument doest not fit in required format");
+                throw new IllegalArgumentException("Passed command or its argument doest not fit in required format");
             }
         } else {
             return false;
@@ -110,13 +111,13 @@ public class InputManager extends Thread {
      * Checks whether input line contains quit command
      * @param s Input line content
      * @return if command is present
-     * @throws InvalidFormatException
+     * @throws IllegalArgumentException
      */
-    private boolean quitCommand(String s) throws InvalidFormatException {
+    private boolean quitCommand(String s) throws IllegalArgumentException {
         CharSequence cs = "quit";
         if (s.contains(cs)) {
-            if (!s.matches("quit")) {
-                throw new InvalidFormatException("Bad command format");
+            if (!s.matches(cs.toString())) {
+                throw new IllegalArgumentException("Bad command format");
             }
         } else {
             return false;
@@ -128,12 +129,12 @@ public class InputManager extends Thread {
      * Checks whether input line contains new payment command
      * @param s Input line content
      * @return if command is present
-     * @throws InvalidFormatException
+     * @throws IllegalArgumentException
      */
-    private boolean inputCommand(String s) throws InvalidFormatException {
+    private boolean inputCommand(String s) throws IllegalArgumentException {
         if (!s.isEmpty() && Character.isUpperCase(s.charAt(0))) {
             if (!s.matches("[A-Z]{3}\\u0020-?\\d+.?\\d*")) {
-                throw new InvalidFormatException("Passed string does not have valid format");
+                throw new IllegalArgumentException("Passed string does not have valid format");
             }
         } else {
             return false;

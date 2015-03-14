@@ -49,7 +49,11 @@ public class OutputManager extends Thread {
                         for (Map.Entry<String, Double> entry: blah.entrySet()) {
                             sb.append(entry.getKey());
                             sb.append(" ");
-                            sb.append(entry.getValue());
+                            Double value = entry.getValue();
+                            if (value == 0) {
+                                continue;
+                            }
+                            sb.append(value);
                             System.out.println(sb.toString());
                             sb.setLength(0);
                         }
@@ -57,10 +61,5 @@ public class OutputManager extends Thread {
                     }
                 },0, this.interval
         );
-    }
-
-    public void shutDown() {
-        logger.debug("Output manager is goin to be shutted down");
-        this.timer.cancel();
     }
 }
